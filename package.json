@@ -1,0 +1,17 @@
+{
+  "name": "jestify",
+  "version": "0.0.1",
+  "description": "script w/ jscodeshift to jestify jasmine specs",
+  "main": "index.js",
+  "repository": "https://github.com/scott-m-sarsfield/jestify.git",
+  "author": "Scott Sarsfield <scott.m.sarsfield@ey.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "jscodeshift": "^0.6.4",
+    "lodash": "^4.17.15"
+  },
+  "bin": {
+    "jestify": "./index.js"
+  }
+}
