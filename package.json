@@ -1,17 +1,27 @@
 {
-  "name": "jestify",
+  "name": "@scott-m-sarsfield/jestify",
   "version": "0.0.1",
   "description": "script w/ jscodeshift to jestify jasmine specs",
   "main": "index.js",
-  "repository": "https://github.com/scott-m-sarsfield/jestify.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scott-m-sarsfield/jestify.git"
+  },
   "author": "Scott Sarsfield <scott.m.sarsfield@ey.com>",
   "license": "UNLICENSED",
-  "private": true,
   "dependencies": {
     "jscodeshift": "^0.6.4",
     "lodash": "^4.17.15"
   },
   "bin": {
     "jestify": "./index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/scott-m-sarsfield/jestify/issues"
+  },
+  "homepage": "https://github.com/scott-m-sarsfield/jestify#readme",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
