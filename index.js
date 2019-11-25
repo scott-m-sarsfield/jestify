@@ -15,7 +15,7 @@ const meow = require('meow');
 const path = require('path');
 const execa = require('execa');
 
-const transformerDirectory = path.join(__dirname, '../', 'transforms');
+const transformerDirectory = path.join(__dirname, './', 'transforms');
 const jscodeshiftExecutable = require.resolve('.bin/jscodeshift');
 
 function runTransform({ files, flags, transformer }) {
