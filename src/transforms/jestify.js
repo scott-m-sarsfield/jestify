@@ -1,139 +1,10 @@
 import removeSpyOnRenderCalls from './jestifications/remove_spy_on_render';
 import removeStubFunctionalComponentCalls from './jestifications/remove_stub_functional_components';
-import { replaceJasmineCreateSpy, replaceSpyOn } from './jestifications/replace_jasmine_spies';
 import replaceSpyOnAsync from './jestifications/replace_spy_on_async';
 import convertToEnzymeTests from './jestifications/make_enzyme_changes';
-import { relativePath } from './jestifications/helpers';
 import find from 'lodash/find';
 import path from 'path';
 import camelCase from 'lodash/camelCase';
-
-function replaceSpyReturnValue(source, j) {
-  return j(source).find(
-    j.MemberExpression,
-    {
-      object: {
-        property: {
-          name: 'and'
-        }
-      },
-      property: {
-        name: 'returnValue'
-      }
-    }
-  ).replaceWith((nodePath) => {
-    const { node } = nodePath;
-    const spy = node.object.object;
-    return j.memberExpression(
-      spy,
-      j.identifier('mockReturnValue')
-    );
-  }).toSource();
-}
-function replaceSpyCallFake(source, j) {
-  return j(source).find(
-    j.MemberExpression,
-    {
-      object: {
-        property: {
-          name: 'and'
-        }
-      },
-      property: {
-        name: 'callFake'
-      }
-    }
-  ).replaceWith((nodePath) => {
-    const { node } = nodePath;
-    const spy = node.object.object;
-    return j.memberExpression(
-      spy,
-      j.identifier('mockImplementation')
-    );
-  }).toSource();
-}
-
-function replaceCallsReset(source, j) {
-  return j(source).find(
-    j.MemberExpression,
-    {
-      object: {
-        property: {
-          name: 'calls'
-        }
-      },
-      property: {
-        name: 'reset'
-      }
-    }
-  ).replaceWith((nodePath) => {
-    const { node } = nodePath;
-    const spy = node.object.object;
-    return j.memberExpression(
-      spy,
-      j.identifier('mockReset')
-    );
-  }).toSource();
-}
-
-function convertToJestSpies(initSource, j) {
-  let source = initSource;
-
-  source = replaceJasmineCreateSpy(source, j);
-  source = replaceSpyOn(source, j);
-  source = replaceSpyReturnValue(source, j);
-  source = replaceSpyCallFake(source, j);
-  source = replaceCallsReset(source, j);
-  return source;
-}
-
-function importPriorGlobals(initialSource, j, filePath) {
-  let source = initialSource;
-
-  source = importArrayToModelStore(source, j, filePath);
-
-  return source;
-}
-
-function importArrayToModelStore(source, j, filePath) {
-  if (!arrayToModelStoreIsUsed(source, j) || arrayToModelStoreAlreadyImported(source, j)) {
-    return source;
-  }
-
-  return j(source).find(
-    j.ImportDeclaration
-  ).at(-1).insertAfter(() => {
-    return j.importDeclaration(
-      [
-        j.importSpecifier(
-          j.identifier('arrayToModelStore'),
-          j.identifier('arrayToModelStore')
-        )
-      ],
-      j.literal(relativePath(filePath, 'app/helpers/data_helper'))
-    );
-  }).toSource();
-}
-
-function arrayToModelStoreIsUsed(source, j) {
-  return j(source).find(
-    j.Identifier,
-    {
-      name: 'arrayToModelStore'
-    }
-  ).size() > 0;
-}
-
-function arrayToModelStoreAlreadyImported(source, j) {
-  return j(source).find(
-    j.ImportSpecifier,
-    {
-      local: {
-        name: 'arrayToModelStore'
-      }
-    }
-  ).size() > 0;
-}
 
 function removeOrReplaceComponentStubs(initialSource, j, fileInfo) {
   let source = initialSource;
@@ -352,8 +223,6 @@ module.exports = function(fileInfo, api /*, options */) {
   let source = fileInfo.source;
   const j = api.jscodeshift;
 
-  source = importPriorGlobals(source, j, fileInfo.path);
-  source = convertToJestSpies(source, j);
   source = convertAsyncTests(source, j);
   source = convertDispatcherTests(source, j, fileInfo.path);
   source = removeOrReplaceComponentStubs(source, j, fileInfo);

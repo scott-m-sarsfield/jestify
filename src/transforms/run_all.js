@@ -1,8 +1,10 @@
 import importFactory from './import_factory';
 import jestify from './jestify';
+import jasmineToJest from 'jest-codemods/dist/transformers/jasmine-globals';
 
 module.exports = function(file, api, options) {
   const fixes = [
+    jasmineToJest,
     importFactory,
     jestify
   ];
