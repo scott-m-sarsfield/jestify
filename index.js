@@ -15,17 +15,19 @@ const meow = require('meow');
 const path = require('path');
 const execa = require('execa');
 
-const transformerDirectory = path.join(__dirname, 'transforms');
+const transformerDistDirectory = path.join(__dirname, 'dist', 'transforms');
 const jscodeshiftExecutable = require.resolve('.bin/jscodeshift');
 
-function runTransform({ files, flags, transformer }) {
-  const transformerPath = path.join(transformerDirectory, `${transformer}.js`);
+function runTransform({ files }) {
+  const transformerPath = path.join(transformerDistDirectory, 'run_all.js');
 
   let args = [];
 
   args.push('--ignore-pattern=**/node_modules/**');
 
   args = args.concat(['--transform', transformerPath]);
+
+  args.push('--no-babel');
 
   args = args.concat(files);
 
@@ -42,8 +44,7 @@ function runTransform({ files, flags, transformer }) {
 }
 
 function expandFilePathsIfNeeded(filesBeforeExpansion) {
-  const shouldExpandFiles = filesBeforeExpansion.some(file =>
-    file.includes('*')
+  const shouldExpandFiles = filesBeforeExpansion.some((file) => file.includes('*')
   );
   return shouldExpandFiles
     ? globby.sync(filesBeforeExpansion)
@@ -70,38 +71,35 @@ function run() {
   );
 
   inquirer
-  .prompt([
-    {
-      type: 'input',
-      name: 'files',
-      message: 'On which files or directory should the codemods be applied?',
-      when: !cli.input[0],
-      default: '.',
-      // validate: () =>
-      filter: files => files.trim()
-    }
-  ])
-  .then(answers => {
-    const { files } = answers;
-    const selectedTransformer = 'jestify';
+    .prompt([
+      {
+        type: 'input',
+        name: 'files',
+        message: 'On which files or directory should the codemods be applied?',
+        when: !cli.input[0],
+        default: '.',
+        // validate: () =>
+        filter: (files) => files.trim()
+      }
+    ])
+    .then((answers) => {
+      const { files } = answers;
 
-    const filesBeforeExpansion = cli.input[0] || files;
-    const filesExpanded = expandFilePathsIfNeeded([filesBeforeExpansion]);
+      const filesBeforeExpansion = cli.input[0] || files;
+      const filesExpanded = expandFilePathsIfNeeded([filesBeforeExpansion]);
 
-    if (!filesExpanded.length) {
-      console.log(
-        `No files found matching ${filesBeforeExpansion.join(' ')}`
-      );
-      return null;
-    }
+      if (!filesExpanded.length) {
+        console.log(
+          `No files found matching ${filesBeforeExpansion.join(' ')}`
+        );
+        return null;
+      }
 
-    return runTransform({
-      files: filesExpanded,
-      flags: cli.flags,
-      transformer: selectedTransformer
+      return runTransform({
+        files: filesExpanded,
+        flags: cli.flags
+      });
     });
-  });
 }
-
 
 run();

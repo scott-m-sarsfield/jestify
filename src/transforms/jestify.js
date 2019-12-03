@@ -2,7 +2,6 @@ import removeSpyOnRenderCalls from './jestifications/remove_spy_on_render';
 import removeStubFunctionalComponentCalls from './jestifications/remove_stub_functional_components';
 import { replaceJasmineCreateSpy, replaceSpyOn } from './jestifications/replace_jasmine_spies';
 import replaceSpyOnAsync from './jestifications/replace_spy_on_async';
-import importFactory from './jestifications/import_factory';
 import convertToEnzymeTests from './jestifications/make_enzyme_changes';
 import { relativePath } from './jestifications/helpers';
 import find from 'lodash/find';
@@ -91,7 +90,6 @@ function convertToJestSpies(initSource, j) {
 function importPriorGlobals(initialSource, j, filePath) {
   let source = initialSource;
 
-  source = importFactory(source, j);
   source = importArrayToModelStore(source, j, filePath);
 
   return source;
