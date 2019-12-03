@@ -1,5 +1,5 @@
 import jscodeshift from 'jscodeshift';
-import { hasJSX } from 'src/transforms/jestifications/has_jsx';
+import { hasJSX } from '../has_jsx';
 
 it('detects when JSX is used', () => {
   expect(hasJSX(`
