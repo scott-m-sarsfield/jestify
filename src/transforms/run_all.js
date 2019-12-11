@@ -1,7 +1,8 @@
 import importFactory from './import_factory';
 import importArrayToModelStore from './import_array_to_model_store';
 import convertAsyncTests from './convert_async_tests';
-import jestify from './jestify';
+import convertToEnzyme from './convert_to_enzyme';
+import replaceComponentStubs from './replace_component_stubs';
 import jasmineToJest from 'jest-codemods/dist/transformers/jasmine-globals';
 import convertDispatcherTests from './convert_dispatcher_tests';
 
@@ -12,7 +13,8 @@ module.exports = function(file, api, options) {
     importArrayToModelStore,
     convertAsyncTests,
     convertDispatcherTests,
-    jestify
+    replaceComponentStubs,
+    convertToEnzyme
   ];
   let src = file.source;
   fixes.forEach((fix) => {

@@ -1,4 +1,4 @@
-export function appendImportDeclaration(root, j, declaration) {
+export function appendAfterImportDeclarations(root, j, declaration) {
   const imports = root.find(j.ImportDeclaration);
 
   if (imports.size() > 0) {

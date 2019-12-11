@@ -1,14 +1,14 @@
 import path from 'path';
 import kebabCase from 'lodash/kebabCase';
 import startCase from 'lodash/startCase';
+import { appendAfterImportDeclarations } from '../../utils/append_after_imports';
+import { relativePath } from './helpers';
 
 function pascalCase(str) {
   return startCase(str).replace(/\s/g, '');
 }
 
-function removeStubFunctionalComponentCalls(source, j, filePath) {
-  const root = j(source);
-
+function removeStubFunctionalComponentCalls(root, j, filePath) {
   const stubFunctionalComponentCalls = root.find(
     j.CallExpression,
     {
@@ -36,8 +36,6 @@ function removeStubFunctionalComponentCalls(source, j, filePath) {
 
   importEachStubbedComponent(j, root, assignedCalls, filePath);
   replaceAssignedVariableWithComponent(j, root, assignedCalls);
-
-  return root.toSource();
 }
 
 function importEachStubbedComponent(j, root, stubFunctionalComponentCalls, filePath) {
@@ -61,9 +59,9 @@ function importEachStubbedComponent(j, root, stubFunctionalComponentCalls, fileP
 
 function scrapeCall(node, filePath) {
   const stubbedPath = node.arguments[0].value;
-  const relativePath = relativePath(filePath, `app/${stubbedPath}`);
+  const _relativePath = relativePath(filePath, `app/${stubbedPath}`);
   return {
-    relativePath,
+    relativePath: _relativePath,
     properName: pascalCase(path.parse(`app/${stubbedPath}`).name)
   };
 }
@@ -123,39 +121,38 @@ function addJestMockForComponent(j, root, { relativePath, className }) {
   if (alreadyMockedComponent(j, root, relativePath)) {
     return;
   }
-  root.find(
-    j.ImportDeclaration
-  ).at(-1).insertAfter(() => {
-    return j.expressionStatement(
-      j.callExpression(
-        j.memberExpression(
-          j.identifier('jest'),
-          j.identifier('mock')
-        ),
-        [
-          j.literal(relativePath),
+
+  const jestMockStatement = j.expressionStatement(
+    j.callExpression(
+      j.memberExpression(
+        j.identifier('jest'),
+        j.identifier('mock')
+      ),
+      [
+        j.literal(relativePath),
+        j.arrowFunctionExpression(
+          [],
           j.arrowFunctionExpression(
             [],
-            j.arrowFunctionExpression(
-              [],
-              j.jsxElement(
-                j.jsxOpeningElement(
-                  j.jsxIdentifier('div'),
-                  [
-                    j.jsxAttribute(
-                      j.jsxIdentifier('className'),
-                      j.literal(className)
-                    )
-                  ],
-                  true
-                )
+            j.jsxElement(
+              j.jsxOpeningElement(
+                j.jsxIdentifier('div'),
+                [
+                  j.jsxAttribute(
+                    j.jsxIdentifier('className'),
+                    j.literal(className)
+                  )
+                ],
+                true
               )
             )
           )
-        ]
-      )
-    );
-  });
+        )
+      ]
+    )
+  );
+
+  appendAfterImportDeclarations(root, j, jestMockStatement);
 }
 
 function alreadyMockedComponent(j, root, relativePath) {
@@ -182,18 +179,16 @@ function addImportForComponent(j, root, { relativePath, properName }) {
     return;
   }
 
-  root.find(
-    j.ImportDeclaration
-  ).at(-1).insertAfter(() => {
-    return j.importDeclaration(
-      [
-        j.importDefaultSpecifier(
-          j.identifier(properName)
-        )
-      ],
-      j.literal(relativePath)
-    );
-  });
+  const componentImportDeclaration = j.importDeclaration(
+    [
+      j.importDefaultSpecifier(
+        j.identifier(properName)
+      )
+    ],
+    j.literal(relativePath)
+  );
+
+  appendAfterImportDeclarations(root, j, componentImportDeclaration);
 }
 
 function alreadyImportingComponent(j, root, relativePath) {

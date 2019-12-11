@@ -1,6 +1,6 @@
 import { relativePath } from './jestifications/helpers';
 import sourceOptions from '../utils/source_options';
-import { appendImportDeclaration } from '../utils/append_import';
+import { appendAfterImportDeclarations } from '../utils/append_after_imports';
 
 function importArrayToModelStore(root, j, filePath) {
   if (!arrayToModelStoreIsUsed(root, j) || arrayToModelStoreAlreadyImported(root, j)) {
@@ -17,7 +17,7 @@ function importArrayToModelStore(root, j, filePath) {
     j.literal(relativePath(filePath, 'frontend/app/helpers/data_helper'))
   );
 
-  appendImportDeclaration(root, j, arrayToModelStoreImport);
+  appendAfterImportDeclarations(root, j, arrayToModelStoreImport);
 }
 
 function arrayToModelStoreIsUsed(root, j) {

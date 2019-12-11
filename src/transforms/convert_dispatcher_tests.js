@@ -2,7 +2,7 @@ import find from 'lodash/find';
 import path from 'path';
 import camelCase from 'lodash/camelCase';
 import sourceOptions from '../utils/source_options';
-import { appendImportDeclaration } from '../utils/append_import';
+import { appendAfterImportDeclarations } from '../utils/append_after_imports';
 
 function isDispatcherFile(filePath) {
   return path.parse(filePath).name.match(/dispatcher/);
@@ -53,7 +53,7 @@ function createDispatcherImportDeclaration(root, j, filePath) {
     j.literal(sourceFile(filePath))
   );
 
-  appendImportDeclaration(root, j, dispatcherImport);
+  appendAfterImportDeclarations(root, j, dispatcherImport);
 }
 
 function convertDispatcherTests(root, j, filePath) {
