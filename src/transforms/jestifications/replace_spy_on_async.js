@@ -1,6 +1,6 @@
 
-function replaceSpyOnAsync(source, j) {
-  return j(source).find(
+function replaceSpyOnAsync(root, j) {
+  root.find(
     j.ExpressionStatement,
     {
       expression: {
@@ -45,8 +45,9 @@ function replaceSpyOnAsync(source, j) {
         )
       )
     );
-  })
-    .toSource();
+  });
+
+  return root;
 }
 
 export default replaceSpyOnAsync;

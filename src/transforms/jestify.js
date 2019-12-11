@@ -1,6 +1,5 @@
 import removeSpyOnRenderCalls from './jestifications/remove_spy_on_render';
 import removeStubFunctionalComponentCalls from './jestifications/remove_stub_functional_components';
-import replaceSpyOnAsync from './jestifications/replace_spy_on_async';
 import convertToEnzymeTests from './jestifications/make_enzyme_changes';
 import find from 'lodash/find';
 import path from 'path';
@@ -11,51 +10,6 @@ function removeOrReplaceComponentStubs(initialSource, j, fileInfo) {
   source = removeSpyOnRenderCalls(source, j);
   source = removeStubFunctionalComponentCalls(source, j, fileInfo.path);
 
-  return source;
-}
-
-function replaceDeferredPromiseResolve(source, j) {
-  return j(source).find(
-    j.CallExpression,
-    {
-      callee: {
-        object: {
-          property: {
-            name: 'promise'
-          }
-        },
-        property: {
-          name: 'resolve'
-        }
-      }
-    }
-  ).replaceWith((nodePath) => {
-    const { node } = nodePath;
-    const object = node.callee.object.object;
-
-    node.callee.object = object;
-    node.callee.property = j.identifier('mockResolvedValue');
-
-    return node;
-  }).toSource();
-}
-
-function removeMockPromises(source, j) {
-  return j(source).find(
-    j.Identifier,
-    {
-      name: 'MockPromises'
-    }
-  ).closest(
-    j.ExpressionStatement
-  ).remove().toSource();
-}
-
-function convertAsyncTests(initialSource, j) {
-  let source = initialSource;
-  source = replaceSpyOnAsync(source, j);
-  source = replaceDeferredPromiseResolve(source, j);
-  source = removeMockPromises(source, j);
   return source;
 }
 
@@ -223,7 +177,6 @@ module.exports = function(fileInfo, api /*, options */) {
   let source = fileInfo.source;
   const j = api.jscodeshift;
 
-  source = convertAsyncTests(source, j);
   source = convertDispatcherTests(source, j, fileInfo.path);
   source = removeOrReplaceComponentStubs(source, j, fileInfo);
   source = convertToEnzymeTests(source, j);
