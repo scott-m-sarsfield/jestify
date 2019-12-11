@@ -1,5 +1,5 @@
-function replacePropsAccessor(source, j, methodName = 'propsOnLastRender') {
-  return j(source).find(
+function replacePropsAccessor(root, j, methodName = 'propsOnLastRender') {
+  root.find(
     j.CallExpression,
     {
       callee: {
@@ -24,11 +24,11 @@ function replacePropsAccessor(source, j, methodName = 'propsOnLastRender') {
       ),
       []
     );
-  }).toSource();
+  });
 }
 
-function replaceJQueryClick(source, j) {
-  return j(source).find(
+function replaceJQueryClick(root, j) {
+  root.find(
     j.CallExpression,
     {
       callee: {
@@ -62,15 +62,11 @@ function replaceJQueryClick(source, j) {
         j.literal('click')
       ]
     );
-  }).toSource();
+  });
 }
 
-export function replaceUtilities(initSource, j) {
-  let source = initSource;
-
-  source = replacePropsAccessor(source, j, 'propsOnLastRender');
-  source = replacePropsAccessor(source, j, 'propsPassedOnLastRender');
-  source = replaceJQueryClick(source, j);
-
-  return source;
+export function replaceUtilities(root, j) {
+  replacePropsAccessor(root, j, 'propsOnLastRender');
+  replacePropsAccessor(root, j, 'propsPassedOnLastRender');
+  replaceJQueryClick(root, j);
 }

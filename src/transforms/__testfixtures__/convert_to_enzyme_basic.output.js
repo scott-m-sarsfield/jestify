@@ -1,4 +1,4 @@
-import { mount } from "enzyme";
+import { mount } from 'enzyme';
 let component;
 describe('basic', () => {
   beforeEach(() => {
@@ -42,6 +42,6 @@ describe('basic', () => {
   });
 
   it('replaces jquery clicks', () => {
-    component.find('.big-o-button').simulate("click");
+    component.find('.big-o-button').simulate('click');
   });
 });

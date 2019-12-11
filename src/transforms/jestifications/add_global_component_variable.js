@@ -1,8 +1,8 @@
-export function addGlobalComponentVariable(source, j) {
-  if (doesComponentVariableExist(source, j)) {
-    return source;
+export function addGlobalComponentVariable(root, j) {
+  if (doesComponentVariableExist(root, j)) {
+    return;
   }
-  return j(source).find(
+  root.find(
     j.ImportDeclaration
   ).at(-1).insertAfter(() => {
     return j.variableDeclaration(
@@ -14,11 +14,11 @@ export function addGlobalComponentVariable(source, j) {
         )
       ]
     );
-  }).toSource();
+  });
 }
 
-function doesComponentVariableExist(source, j) {
-  return j(source).find(
+function doesComponentVariableExist(root, j) {
+  return root.find(
     j.VariableDeclarator,
     {
       id: {

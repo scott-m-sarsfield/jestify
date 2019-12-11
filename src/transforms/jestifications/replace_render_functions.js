@@ -1,5 +1,5 @@
-function replaceReactDOMRender(source, j) {
-  return j(source).find(
+function replaceReactDOMRender(root, j) {
+  root.find(
     j.ExpressionStatement,
     {
       expression: {
@@ -27,13 +27,9 @@ function replaceReactDOMRender(source, j) {
         )
       )
     );
-  }).toSource();
+  });
 }
 
-export function replaceRenderFunctions(initSource, j) {
-  let source = initSource;
-
-  source = replaceReactDOMRender(source, j);
-
-  return source;
+export function replaceRenderFunctions(root, j) {
+  replaceReactDOMRender(root, j);
 }

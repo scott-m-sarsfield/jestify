@@ -1,11 +1,11 @@
 import { hasJSX } from './has_jsx';
 
-function importEnzymeMount(source, j) {
-  if (!hasJSX(source, j) || isEnzymeAlreadyImported(source, j)) {
-    return source;
+function importEnzymeMount(root, j) {
+  if (!hasJSX(root, j) || isEnzymeAlreadyImported(root, j)) {
+    return;
   }
 
-  return j(source).find(
+  root.find(
     j.Program
   ).replaceWith((pathNode) => {
     const factoryImport = j.importDeclaration(
@@ -21,11 +21,11 @@ function importEnzymeMount(source, j) {
     pathNode.node.body.splice(0, 0, factoryImport);
 
     return pathNode.node;
-  }).toSource();
+  });
 }
 
-function isEnzymeAlreadyImported(source, j) {
-  return j(source).find(
+function isEnzymeAlreadyImported(root, j) {
+  return root.find(
     j.ImportDeclaration,
     {
       source: {

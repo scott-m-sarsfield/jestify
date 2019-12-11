@@ -1,5 +1,5 @@
-function replaceJQueryTextTests(source, j) {
-  return j(source).find(
+function replaceJQueryTextTests(root, j) {
+  return root.find(
     j.MemberExpression,
     {
       object: {
@@ -44,11 +44,11 @@ function replaceJQueryTextTests(source, j) {
       ),
       j.identifier('toHaveText')
     );
-  }).toSource();
+  });
 }
 
-function replaceSpyComponentPropAssertions(source, j, matcher = 'toHaveBeenRenderedWithProps') {
-  return j(source).find(
+function replaceSpyComponentPropAssertions(root, j, matcher = 'toHaveBeenRenderedWithProps') {
+  return root.find(
     j.MemberExpression,
     {
       object: {
@@ -80,11 +80,11 @@ function replaceSpyComponentPropAssertions(source, j, matcher = 'toHaveBeenRende
       ),
       j.identifier('toHaveProp')
     );
-  }).toSource();
+  });
 }
 
-function removeRedundantHavePropObjectContaining(source, j) {
-  return j(source).find(
+function removeRedundantHavePropObjectContaining(root, j) {
+  return root.find(
     j.CallExpression,
     {
       callee: {
@@ -112,11 +112,11 @@ function removeRedundantHavePropObjectContaining(source, j) {
     const propsToMatch = node.arguments[0].arguments;
     node.arguments = propsToMatch;
     return node;
-  }).toSource();
+  });
 }
 
-function replaceRootExpectations(source, j) {
-  return j(source).find(
+function replaceRootExpectations(root, j) {
+  return root.find(
     j.CallExpression,
     {
       callee: {
@@ -136,11 +136,11 @@ function replaceRootExpectations(source, j) {
     ];
 
     return node;
-  }).toSource();
+  });
 }
 
-function replaceToContainText(source, j) {
-  return j(source).find(
+function replaceToContainText(root, j) {
+  return root.find(
     j.MemberExpression,
     {
       property: {
@@ -151,11 +151,11 @@ function replaceToContainText(source, j) {
     const { node } = nodePath;
     node.property = j.identifier('toIncludeText');
     return node;
-  }).toSource();
+  });
 }
 
-function replaceLiteralToExist(source, j) {
-  return j(source).find(
+function replaceLiteralToExist(root, j) {
+  return root.find(
     j.MemberExpression,
     {
       object: {
@@ -187,19 +187,15 @@ function replaceLiteralToExist(source, j) {
       )
     ];
     return node;
-  }).toSource();
+  });
 }
 
-export function replaceAssertions(initSource, j) {
-  let source = initSource;
-
-  source = replaceSpyComponentPropAssertions(source, j, 'toHaveBeenRenderedWithProps');
-  source = replaceSpyComponentPropAssertions(source, j, 'toHaveBeenPassedProps');
-  source = removeRedundantHavePropObjectContaining(source, j);
-  source = replaceJQueryTextTests(source, j);
-  source = replaceRootExpectations(source, j);
-  source = replaceToContainText(source, j);
-  source = replaceLiteralToExist(source, j);
-
-  return source;
+export function replaceAssertions(root, j) {
+  replaceSpyComponentPropAssertions(root, j, 'toHaveBeenRenderedWithProps');
+  replaceSpyComponentPropAssertions(root, j, 'toHaveBeenPassedProps');
+  removeRedundantHavePropObjectContaining(root, j);
+  replaceJQueryTextTests(root, j);
+  replaceRootExpectations(root, j);
+  replaceToContainText(root, j);
+  replaceLiteralToExist(root, j);
 }
