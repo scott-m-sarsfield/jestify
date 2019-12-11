@@ -1,4 +1,5 @@
 import importFactory from './import_factory';
+import importArrayToModelStore from './import_array_to_model_store';
 import jestify from './jestify';
 import jasmineToJest from 'jest-codemods/dist/transformers/jasmine-globals';
 
@@ -6,6 +7,7 @@ module.exports = function(file, api, options) {
   const fixes = [
     jasmineToJest,
     importFactory,
+    importArrayToModelStore,
     jestify
   ];
   let src = file.source;

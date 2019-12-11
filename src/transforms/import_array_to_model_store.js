@@ -15,7 +15,7 @@ function importArrayToModelStore(root, j, filePath) {
         j.identifier('arrayToModelStore')
       )
     ],
-    j.literal(relativePath(filePath, 'app/helpers/data_helper'))
+    j.literal(relativePath(filePath, 'frontend/app/helpers/data_helper'))
   );
 
   if (hasImports) {
