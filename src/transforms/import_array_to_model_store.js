@@ -1,12 +1,11 @@
 import { relativePath } from './jestifications/helpers';
 import sourceOptions from '../utils/source_options';
+import { appendImportDeclaration } from '../utils/append_import';
 
 function importArrayToModelStore(root, j, filePath) {
   if (!arrayToModelStoreIsUsed(root, j) || arrayToModelStoreAlreadyImported(root, j)) {
     return root;
   }
-
-  const hasImports = root.find(j.ImportDeclaration).size() > 0;
 
   const arrayToModelStoreImport = j.importDeclaration(
     [
@@ -18,19 +17,7 @@ function importArrayToModelStore(root, j, filePath) {
     j.literal(relativePath(filePath, 'frontend/app/helpers/data_helper'))
   );
 
-  if (hasImports) {
-    return root.find(
-      j.ImportDeclaration
-    ).at(-1).insertAfter(() => {
-      return arrayToModelStoreImport;
-    });
-  }
-
-  return root.find(j.Program).replaceWith((nodePath) => {
-    const { node } = nodePath;
-    node.body = [arrayToModelStoreImport].concat(node.body);
-    return node;
-  });
+  appendImportDeclaration(root, j, arrayToModelStoreImport);
 }
 
 function arrayToModelStoreIsUsed(root, j) {
@@ -59,7 +46,7 @@ export default function(fileInfo, api) {
 
   let root = j(source);
 
-  root = importArrayToModelStore(root, j, fileInfo.path);
+  importArrayToModelStore(root, j, fileInfo.path);
 
   return root.toSource(sourceOptions);
 }

@@ -1,7 +1,6 @@
 import path from 'path';
 import kebabCase from 'lodash/kebabCase';
 import startCase from 'lodash/startCase';
-import { relativePath } from './helpers';
 
 function pascalCase(str) {
   return startCase(str).replace(/\s/g, '');

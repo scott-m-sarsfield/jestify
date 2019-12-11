@@ -60,6 +60,7 @@
   },
   "scripts": {
     "start": "./index.js",
+    "lint": "npx eslint .",
     "build": "./node_modules/.bin/babel src --out-dir=dist --ignore 'src/transforms/**/__tests__/**','transforms/**/__testfixtures__/**'"
   }
 }

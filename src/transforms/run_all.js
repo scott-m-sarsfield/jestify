@@ -3,6 +3,7 @@ import importArrayToModelStore from './import_array_to_model_store';
 import convertAsyncTests from './convert_async_tests';
 import jestify from './jestify';
 import jasmineToJest from 'jest-codemods/dist/transformers/jasmine-globals';
+import convertDispatcherTests from './convert_dispatcher_tests';
 
 module.exports = function(file, api, options) {
   const fixes = [
@@ -10,6 +11,7 @@ module.exports = function(file, api, options) {
     importFactory,
     importArrayToModelStore,
     convertAsyncTests,
+    convertDispatcherTests,
     jestify
   ];
   let src = file.source;

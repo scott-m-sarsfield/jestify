@@ -1,0 +1,4 @@
+*.input.js
+*.output.js
+jest.config.js
+dist/
