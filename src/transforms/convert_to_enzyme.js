@@ -6,6 +6,50 @@ import { replaceAssertions } from './jestifications/replace_assertions';
 import { replaceUtilities } from './jestifications/replace_utilities';
 import sourceOptions from '../utils/source_options';
 
+function cleanupReactTestRendererExpectCurry(root, j) {
+  let curriedVariable;
+
+  root.find(
+    j.ImportDefaultSpecifier,
+    {
+      local: {
+        name: 'expectComponentToExistWithPropsCurry'
+      }
+    }
+  ).closest(j.ImportDeclaration).remove();
+
+  const curryAssignments = root.find(
+    j.AssignmentExpression,
+    {
+      right: {
+        callee: {
+          name: 'expectComponentToExistWithPropsCurry'
+        }
+      }
+    }
+  );
+
+  curryAssignments.forEach((nodePath) => {
+    const { node } = nodePath;
+    curriedVariable = node.left.name;
+  });
+
+  curryAssignments.closest(j.ExpressionStatement).remove();
+
+  root.find(
+    j.VariableDeclarator,
+    {
+      id: {
+        name: curriedVariable
+      }
+    }
+  ).remove();
+}
+
+function cleanupUselessCode(root, j) {
+  cleanupReactTestRendererExpectCurry(root, j);
+}
+
 function makeEnzymeChanges(root, j) {
   if (!hasJSX(root, j)) {
     return;
@@ -16,6 +60,7 @@ function makeEnzymeChanges(root, j) {
   replaceRenderFunctions(root, j);
   replaceAssertions(root, j);
   replaceUtilities(root, j);
+  cleanupUselessCode(root, j);
 }
 
 module.exports = function(fileInfo, api /*, options */) {

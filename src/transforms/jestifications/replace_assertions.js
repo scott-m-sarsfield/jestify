@@ -190,9 +190,49 @@ function replaceLiteralToExist(root, j) {
   });
 }
 
+function replaceReactTestRendererExpectComponentWithPropsToExist(root, j) {
+  root.find(
+    j.ExpressionStatement,
+    {
+      expression: {
+        callee: {
+          name: 'expectComponentToExistWithProps'
+        }
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    const component = node.expression.arguments[0];
+    const props = node.expression.arguments[1];
+
+    return j.expressionStatement(
+      j.callExpression(
+        j.memberExpression(
+          j.callExpression(
+            j.identifier('expect'),
+            [
+              j.callExpression(
+                j.memberExpression(
+                  j.identifier('component'),
+                  j.identifier('find')
+                ),
+                [component]
+              )
+            ]
+          ),
+          j.identifier('toHaveProp')
+        ),
+        [props]
+      )
+    );
+  });
+}
+
 export function replaceAssertions(root, j) {
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenRenderedWithProps');
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenPassedProps');
+  replaceReactTestRendererExpectComponentWithPropsToExist(root, j);
   removeRedundantHavePropObjectContaining(root, j);
   replaceJQueryTextTests(root, j);
   replaceRootExpectations(root, j);

@@ -1,5 +1,6 @@
 const sourceOptions = {
-  quote: 'single'
+  quote: 'single',
+  tabWidth: 2
 };
 
 export default sourceOptions;
