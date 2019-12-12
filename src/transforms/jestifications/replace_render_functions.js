@@ -1,3 +1,5 @@
+import forEach from 'lodash/forEach';
+
 function generateComponentEqualMount(j, jsx) {
   return j.expressionStatement(
     j.assignmentExpression(
@@ -55,45 +57,72 @@ function replaceReactTestRendererCreate(root, j, variables) {
     const { node } = nodePath;
     const jsx = node.expression.right.arguments[0];
 
-    variables.rendererVariable = node.expression.left.name;
+    variables.rendererVariables = [node.expression.left.name].concat(variables.rendererVariables);
 
     return generateComponentEqualMount(j, jsx);
   });
 
-  const instanceAssignments = root.find(
-    j.Identifier,
-    { name: variables.rendererVariable }
-  ).closest(j.AssignmentExpression);
-
-  instanceAssignments.forEach((nodePath) => {
+  root.find(
+    j.VariableDeclaration,
+    {
+      declarations: [{
+        init: {
+          callee: {
+            object: {
+              name: 'TestRenderer'
+            },
+            property: {
+              name: 'create'
+            }
+          }
+        }
+      }]
+    }
+  ).replaceWith((nodePath) => {
     const { node } = nodePath;
-    variables.instanceVariable = node.left.name;
-  });
+    const jsx = node.declarations[0].init.arguments[0];
 
-  instanceAssignments.closest(j.ExpressionStatement).remove();
+    variables.rendererVariables = [node.declarations[0].id.name].concat(variables.rendererVariables);
+
+    return generateComponentEqualMount(j, jsx);
+  });
 
   root.find(
     j.ImportDefaultSpecifier,
     { local: { name: 'TestRenderer' }}
   ).closest(j.ImportDeclaration).remove();
 
-  root.find(
-    j.VariableDeclarator,
-    {
-      id: {
-        name: variables.rendererVariable
-      }
-    }
-  ).remove();
+  forEach(variables.rendererVariables, (rendererVariable) => {
+    const instanceAssignments = root.find(
+      j.Identifier,
+      { name: rendererVariable }
+    ).closest(j.AssignmentExpression);
 
-  root.find(
-    j.VariableDeclarator,
-    {
-      id: {
-        name: variables.instanceVariable
+    instanceAssignments.forEach((nodePath) => {
+      const { node } = nodePath;
+      variables.instanceVariable = node.left.name;
+    });
+
+    instanceAssignments.closest(j.ExpressionStatement).remove();
+
+    root.find(
+      j.VariableDeclarator,
+      {
+        id: {
+          name: rendererVariable
+        }
       }
-    }
-  ).remove();
+    ).remove();
+
+    root.find(
+      j.VariableDeclarator,
+      {
+        id: {
+          name: variables.instanceVariable
+        }
+      }
+    ).remove();
+  });
 }
 
 export function replaceRenderFunctions(root, j, variables) {

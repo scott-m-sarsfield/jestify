@@ -25,4 +25,10 @@ describe('ComponentUnderTest', () => {
       });
     });
   });
+
+  describe('other', () => {
+    beforeEach(() => {
+      component = mount(<CountriesSiderFields {...props} />);
+    })
+  });
 });

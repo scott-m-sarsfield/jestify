@@ -32,4 +32,12 @@ describe('ComponentUnderTest', () => {
       );
     });
   });
+
+  describe('other', () => {
+    beforeEach(() => {
+      const varDeclRenderer = TestRenderer.create(
+        <CountriesSiderFields {...props} />
+      );
+    })
+  });
 });
