@@ -190,13 +190,36 @@ function replaceLiteralToExist(root, j) {
   });
 }
 
-function replaceReactTestRendererExpectComponentWithPropsToExist(root, j) {
+function replaceReactTestRendererExpectComponentWithPropsToExist(root, j, variables) {
+  root.find(
+    j.ImportDeclaration
+  ).filter((nodePath) => {
+    const { node } = nodePath;
+    return !!node.source.value.match(/expect_component_with_props_to_exist_curry/);
+  }).forEach((nodePath) => {
+    const { node } = nodePath;
+
+    variables.expectComponentToExistCurryVariable = node.specifiers[0].local.name;
+  });
+
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        name: variables.expectComponentToExistCurryVariable
+      }
+    }
+  ).closest(j.AssignmentExpression).forEach((nodePath) => {
+    const { node } = nodePath;
+    variables.expectComponentToExistVariable = node.left.name;
+  });
+
   root.find(
     j.ExpressionStatement,
     {
       expression: {
         callee: {
-          name: 'expectComponentToExistWithProps'
+          name: variables.expectComponentToExistVariable
         }
       }
     }
@@ -229,10 +252,10 @@ function replaceReactTestRendererExpectComponentWithPropsToExist(root, j) {
   });
 }
 
-export function replaceAssertions(root, j) {
+export function replaceAssertions(root, j, variables) {
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenRenderedWithProps');
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenPassedProps');
-  replaceReactTestRendererExpectComponentWithPropsToExist(root, j);
+  replaceReactTestRendererExpectComponentWithPropsToExist(root, j, variables);
   removeRedundantHavePropObjectContaining(root, j);
   replaceJQueryTextTests(root, j);
   replaceRootExpectations(root, j);

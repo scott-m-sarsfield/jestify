@@ -6,14 +6,12 @@ import { replaceAssertions } from './jestifications/replace_assertions';
 import { replaceUtilities } from './jestifications/replace_utilities';
 import sourceOptions from '../utils/source_options';
 
-function cleanupReactTestRendererExpectCurry(root, j) {
-  let curriedVariable;
-
+function cleanupReactTestRendererExpectCurry(root, j, { expectComponentToExistCurryVariable, expectComponentToExistVariable }) {
   root.find(
     j.ImportDefaultSpecifier,
     {
       local: {
-        name: 'expectComponentToExistWithPropsCurry'
+        name: expectComponentToExistCurryVariable
       }
     }
   ).closest(j.ImportDeclaration).remove();
@@ -23,16 +21,11 @@ function cleanupReactTestRendererExpectCurry(root, j) {
     {
       right: {
         callee: {
-          name: 'expectComponentToExistWithPropsCurry'
+          name: expectComponentToExistCurryVariable
         }
       }
     }
   );
-
-  curryAssignments.forEach((nodePath) => {
-    const { node } = nodePath;
-    curriedVariable = node.left.name;
-  });
 
   curryAssignments.closest(j.ExpressionStatement).remove();
 
@@ -40,14 +33,14 @@ function cleanupReactTestRendererExpectCurry(root, j) {
     j.VariableDeclarator,
     {
       id: {
-        name: curriedVariable
+        name: expectComponentToExistVariable
       }
     }
   ).remove();
 }
 
-function cleanupUselessCode(root, j) {
-  cleanupReactTestRendererExpectCurry(root, j);
+function cleanupUselessCode(root, j, variables) {
+  cleanupReactTestRendererExpectCurry(root, j, variables);
 }
 
 function makeEnzymeChanges(root, j) {
@@ -55,12 +48,14 @@ function makeEnzymeChanges(root, j) {
     return;
   }
 
+  const variables = {};
+
   importEnzymeMount(root, j);
   addGlobalComponentVariable(root, j);
-  replaceRenderFunctions(root, j);
-  replaceAssertions(root, j);
+  replaceRenderFunctions(root, j, variables);
+  replaceAssertions(root, j, variables);
   replaceUtilities(root, j);
-  cleanupUselessCode(root, j);
+  cleanupUselessCode(root, j, variables);
 }
 
 module.exports = function(fileInfo, api /*, options */) {

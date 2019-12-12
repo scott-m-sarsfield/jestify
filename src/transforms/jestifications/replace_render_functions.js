@@ -34,9 +34,7 @@ function replaceReactDOMRender(root, j) {
   });
 }
 
-function replaceReactTestRendererCreate(root, j) {
-  let rendererVariable, instanceVariable;
-
+function replaceReactTestRendererCreate(root, j, variables) {
   root.find(
     j.ExpressionStatement,
     {
@@ -57,19 +55,19 @@ function replaceReactTestRendererCreate(root, j) {
     const { node } = nodePath;
     const jsx = node.expression.right.arguments[0];
 
-    rendererVariable = node.expression.left.name;
+    variables.rendererVariable = node.expression.left.name;
 
     return generateComponentEqualMount(j, jsx);
   });
 
   const instanceAssignments = root.find(
     j.Identifier,
-    { name: rendererVariable }
+    { name: variables.rendererVariable }
   ).closest(j.AssignmentExpression);
 
   instanceAssignments.forEach((nodePath) => {
     const { node } = nodePath;
-    instanceVariable = node.left.name;
+    variables.instanceVariable = node.left.name;
   });
 
   instanceAssignments.closest(j.ExpressionStatement).remove();
@@ -83,7 +81,7 @@ function replaceReactTestRendererCreate(root, j) {
     j.VariableDeclarator,
     {
       id: {
-        name: rendererVariable
+        name: variables.rendererVariable
       }
     }
   ).remove();
@@ -92,13 +90,13 @@ function replaceReactTestRendererCreate(root, j) {
     j.VariableDeclarator,
     {
       id: {
-        name: instanceVariable
+        name: variables.instanceVariable
       }
     }
   ).remove();
 }
 
-export function replaceRenderFunctions(root, j) {
+export function replaceRenderFunctions(root, j, variables) {
   replaceReactDOMRender(root, j);
-  replaceReactTestRendererCreate(root, j);
+  replaceReactTestRendererCreate(root, j, variables);
 }
