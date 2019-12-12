@@ -1,3 +1,5 @@
+import forEach from 'lodash/forEach';
+
 function replacePropsAccessor(root, j, methodName = 'propsOnLastRender') {
   root.find(
     j.CallExpression,
@@ -65,8 +67,49 @@ function replaceJQueryClick(root, j) {
   });
 }
 
-export function replaceUtilities(root, j) {
+function replaceReactTestRendererFindBy(root, j, variables) {
+  const { instanceVariables } = variables;
+
+  forEach(instanceVariables, (instanceVariable) => {
+    root.find(
+      j.MemberExpression,
+      {
+        object: {
+          name: instanceVariable
+        },
+        property: {
+          name: 'findByType'
+        }
+      }
+    ).replaceWith(() => {
+      return j.memberExpression(
+        j.identifier('component'),
+        j.identifier('find')
+      );
+    });
+
+    root.find(
+      j.MemberExpression,
+      {
+        object: {
+          name: instanceVariable
+        },
+        property: {
+          name: 'findByProps'
+        }
+      }
+    ).replaceWith(() => {
+      return j.memberExpression(
+        j.identifier('component'),
+        j.identifier('find')
+      );
+    });
+  });
+}
+
+export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
   replaceJQueryClick(root, j);
+  replaceReactTestRendererFindBy(root, j, variables);
 }

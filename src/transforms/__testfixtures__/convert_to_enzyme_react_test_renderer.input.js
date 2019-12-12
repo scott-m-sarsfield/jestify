@@ -38,6 +38,11 @@ describe('ComponentUnderTest', () => {
       const varDeclRenderer = TestRenderer.create(
         <CountriesSiderFields {...props} />
       );
-    })
+    });
+
+    it('asserts something', () => {
+      instance.findByType(ChildComponent).props.onClick();
+      expect(instance.findByProps({children: 'banana'})).toExist();
+    });
   });
 });

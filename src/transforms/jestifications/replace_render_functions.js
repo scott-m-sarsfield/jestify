@@ -100,7 +100,7 @@ function replaceReactTestRendererCreate(root, j, variables) {
 
     instanceAssignments.forEach((nodePath) => {
       const { node } = nodePath;
-      variables.instanceVariable = node.left.name;
+      variables.instanceVariables = [node.left.name].concat(variables.instanceVariables);
     });
 
     instanceAssignments.closest(j.ExpressionStatement).remove();
@@ -113,12 +113,14 @@ function replaceReactTestRendererCreate(root, j, variables) {
         }
       }
     ).remove();
+  });
 
+  forEach(variables.instanceVariables, (instanceVariable) => {
     root.find(
       j.VariableDeclarator,
       {
         id: {
-          name: variables.instanceVariable
+          name: instanceVariable
         }
       }
     ).remove();

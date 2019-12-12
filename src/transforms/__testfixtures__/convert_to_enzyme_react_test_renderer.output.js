@@ -29,6 +29,11 @@ describe('ComponentUnderTest', () => {
   describe('other', () => {
     beforeEach(() => {
       component = mount(<CountriesSiderFields {...props} />);
-    })
+    });
+
+    it('asserts something', () => {
+      component.find(ChildComponent).props.onClick();
+      expect(component.find({children: 'banana'})).toExist();
+    });
   });
 });
