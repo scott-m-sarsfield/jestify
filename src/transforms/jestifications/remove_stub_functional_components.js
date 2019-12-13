@@ -4,6 +4,8 @@ import startCase from 'lodash/startCase';
 import { appendAfterImportDeclarations } from '../../utils/append_after_imports';
 import { relativePath } from './helpers';
 
+const PATH_TO_COMPONENTS_DIR = 'frontend/app/';
+
 function pascalCase(str) {
   return startCase(str).replace(/\s/g, '');
 }
@@ -59,10 +61,10 @@ function importEachStubbedComponent(j, root, stubFunctionalComponentCalls, fileP
 
 function scrapeCall(node, filePath) {
   const stubbedPath = node.arguments[0].value;
-  const _relativePath = relativePath(filePath, `app/${stubbedPath}`);
+  const _relativePath = relativePath(filePath, PATH_TO_COMPONENTS_DIR + stubbedPath);
   return {
     relativePath: _relativePath,
-    properName: pascalCase(path.parse(`app/${stubbedPath}`).name)
+    properName: pascalCase(path.parse(PATH_TO_COMPONENTS_DIR + stubbedPath).name)
   };
 }
 
@@ -105,10 +107,10 @@ function mockEachStubbedComponent(j, root, stubFunctionalComponentCalls, filePat
     const { node } = nodePath;
 
     const stubbedPath = node.arguments[0].value;
-    const relativePath = path.relative(path.parse(filePath).dir, `app/${stubbedPath}`);
+    const relativePath = path.relative(path.parse(filePath).dir, PATH_TO_COMPONENTS_DIR + stubbedPath);
     stubbedComponents.push({
       relativePath,
-      className: kebabCase(path.parse(`app/${stubbedPath}`).name)
+      className: kebabCase(path.parse(PATH_TO_COMPONENTS_DIR + stubbedPath).name)
     });
   });
 
