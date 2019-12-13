@@ -127,7 +127,30 @@ function replaceReactTestRendererCreate(root, j, variables) {
   });
 }
 
+function replaceReactDOMUnmount(root, j) {
+  root.find(
+    j.MemberExpression,
+    {
+      object: {
+        name: 'ReactDOM'
+      },
+      property: {
+        name: 'unmountComponentAtNode'
+      }
+    }
+  ).closest(j.CallExpression).replaceWith(() => {
+    return j.callExpression(
+      j.memberExpression(
+        j.identifier('component'),
+        j.identifier('unmount')
+      ),
+      []
+    );
+  });
+}
+
 export function replaceRenderFunctions(root, j, variables) {
   replaceReactDOMRender(root, j);
+  replaceReactDOMUnmount(root, j);
   replaceReactTestRendererCreate(root, j, variables);
 }

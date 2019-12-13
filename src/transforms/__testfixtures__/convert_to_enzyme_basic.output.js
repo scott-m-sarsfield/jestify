@@ -65,4 +65,8 @@ describe('basic', () => {
   it('replaces array selector', () => {
     component.find('.question').at(0).text() = 'answer';
   });
+
+  it('replaces unmount', () => {
+    component.unmount();
+  });
 });

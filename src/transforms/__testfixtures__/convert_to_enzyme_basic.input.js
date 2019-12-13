@@ -66,4 +66,8 @@ describe('basic', () => {
   it('replaces array selector', () => {
     $('.question')[0].innerText = 'answer';
   });
+
+  it('replaces unmount', () => {
+    ReactDOM.unmountComponentAtNode(root);
+  });
 });
