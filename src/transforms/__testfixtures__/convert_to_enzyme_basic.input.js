@@ -55,6 +55,10 @@ describe('basic', () => {
     expect(propsPassedOnLastRender(Bronco).buck).toBe('redundant');
   });
 
+  it('replaces propsOnRenderAt', () => {
+    propsOnRenderAt(Bumblebee, 2).onSubmit();
+  });
+
   it('replaces jquery clicks', () => {
     $('.big-o-button').click();
   });

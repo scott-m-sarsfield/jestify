@@ -54,6 +54,10 @@ describe('basic', () => {
     expect(component.find(Bronco).props().buck).toBe('redundant');
   });
 
+  it('replaces propsOnRenderAt', () => {
+    component.find(Bumblebee).at(2).props().onSubmit();
+  });
+
   it('replaces jquery clicks', () => {
     component.find('.big-o-button').simulate('click');
   });

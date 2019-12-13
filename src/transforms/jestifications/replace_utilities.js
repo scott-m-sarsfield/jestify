@@ -198,9 +198,47 @@ function replaceSpyComponent(root, j) {
   });
 }
 
+function replacePropsOnRenderAt(root, j) {
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        name: 'propsOnRenderAt'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    return j.callExpression(
+      j.memberExpression(
+        j.callExpression(
+          j.memberExpression(
+            j.callExpression(
+              j.memberExpression(
+                j.identifier('component'),
+                j.identifier('find')
+              ),
+              [
+                node.arguments[0]
+              ]
+            ),
+            j.identifier('at')
+          ),
+          [
+            node.arguments[1]
+          ]
+        ),
+        j.identifier('props')
+      ),
+      []
+    );
+  });
+}
+
 export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
+  replacePropsOnRenderAt(root, j);
   replaceJQueryClick(root, j);
   replaceReactTestRendererFindBy(root, j, variables);
   replaceJQuerySelectors(root, j);

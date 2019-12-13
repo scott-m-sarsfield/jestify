@@ -9,7 +9,7 @@ function removeSpyOnRenderCalls(root, j) {
         name: 'spyOnRender'
       }
     }
-  ).remove();
+  ).closest(j.ExpressionStatement).remove();
 }
 
 module.exports = function(fileInfo, api /*, options */) {
