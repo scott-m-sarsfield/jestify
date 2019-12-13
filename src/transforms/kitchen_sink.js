@@ -1,4 +1,6 @@
 import sourceOptions from '../utils/source_options';
+import uniq from 'lodash/uniq';
+import difference from 'lodash/difference';
 import path from 'path';
 import { autoIncludeImport } from '../utils/auto_include_import';
 
@@ -158,6 +160,75 @@ function fixActionDispatchAssertions(root, j, path) {
   });
 }
 
+function autoStubActions(root, j) {
+  let knownActions = [];
+  root.find(
+    j.MemberExpression,
+    {
+      object: {
+        name: 'Actions'
+      }
+    }
+  ).forEach((nodePath) => {
+    const { node } = nodePath;
+
+    knownActions.push(node.property.name);
+  });
+
+  knownActions = uniq(knownActions);
+
+  let stubbedActions = [];
+  root.find(
+    j.AssignmentExpression,
+    {
+      left: {
+        object: {
+          name: 'Actions'
+        }
+      }
+    }
+  ).forEach((nodePath) => {
+    const { node } = nodePath;
+    stubbedActions.push(node.left.property.name);
+  });
+
+  knownActions = difference(knownActions, stubbedActions);
+
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        name: 'beforeEach'
+      }
+    }
+  ).at(0).find(
+    j.BlockStatement
+  ).at(0).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    const actionStubs = knownActions.map((knownAction) => j.expressionStatement(
+      j.assignmentExpression(
+        '=',
+        j.memberExpression(
+          j.identifier('Actions'),
+          j.identifier(knownAction)
+        ),
+        j.callExpression(
+          j.memberExpression(
+            j.identifier('jest'),
+            j.identifier('fn')
+          ),
+          []
+        )
+      )
+    ));
+
+    node.body = actionStubs.concat(node.body);
+
+    return node;
+  });
+}
+
 module.exports = function(fileInfo, api /*, options */) {
   let source = fileInfo.source;
   const j = api.jscodeshift;
@@ -171,6 +242,7 @@ module.exports = function(fileInfo, api /*, options */) {
     importSource: 'p-flux',
     last: true
   });
+  autoStubActions(root, j);
 
   return root.toSource(sourceOptions);
 };

@@ -1,6 +1,7 @@
 import { Actions } from 'p-flux';
 describe('kitchen sink', () => {
   beforeEach(() => {
+    Actions.illuminati = jest.fn();
     Actions.fetchWhatever = jest.fn();
     Actions.fetchWhatever.mockImplementation(() => {});
   });
