@@ -241,7 +241,89 @@ function replaceReactTestRendererExpectComponentWithPropsToExist(root, j, variab
   });
 }
 
+function replaceSpyComponentRendered(root, j) {
+  return root.find(
+    j.MemberExpression,
+    {
+      object: {
+        callee: {
+          name: 'expect'
+        }
+      },
+      property: {
+        name: 'toHaveBeenRendered'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    const component = node.object.arguments[0];
+
+    return j.memberExpression(
+      j.callExpression(
+        j.identifier('expect'),
+        [
+          j.callExpression(
+            j.memberExpression(
+              j.identifier('component'),
+              j.identifier('find')
+            ),
+            [component]
+          )
+        ]
+      ),
+      j.identifier('toExist')
+    );
+  });
+}
+
+function replaceSpyComponentNotRendered(root, j) {
+  return root.find(
+    j.MemberExpression,
+    {
+      object: {
+        object: {
+          callee: {
+            name: 'expect'
+          }
+        },
+        property: {
+          name: 'not'
+        }
+      },
+      property: {
+        name: 'toHaveBeenRendered'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    const component = node.object.object.arguments[0];
+
+    return j.memberExpression(
+      j.memberExpression(
+        j.callExpression(
+          j.identifier('expect'),
+          [
+            j.callExpression(
+              j.memberExpression(
+                j.identifier('component'),
+                j.identifier('find')
+              ),
+              [component]
+            )
+          ]
+        ),
+        j.identifier('not')
+      ),
+      j.identifier('toExist')
+    );
+  });
+}
+
 export function replaceAssertions(root, j, variables) {
+  replaceSpyComponentRendered(root, j);
+  replaceSpyComponentNotRendered(root, j);
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenRenderedWithProps');
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenPassedProps');
   replaceReactTestRendererExpectComponentWithPropsToExist(root, j, variables);

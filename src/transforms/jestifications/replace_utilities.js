@@ -177,6 +177,27 @@ function replaceInnerText(root, j) {
   });
 }
 
+function replaceSpyComponent(root, j) {
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        name: 'createSpyComponent'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    if (node.arguments[0]) {
+      return node.arguments[0];
+    }
+    return j.arrowFunctionExpression(
+      [],
+      j.literal(null)
+    );
+  });
+}
+
 export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
@@ -185,4 +206,5 @@ export function replaceUtilities(root, j, variables) {
   replaceJQuerySelectors(root, j);
   replaceComponentFindArrayAccessor(root, j);
   replaceInnerText(root, j);
+  replaceSpyComponent(root, j);
 }

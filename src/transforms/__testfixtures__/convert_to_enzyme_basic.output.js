@@ -2,7 +2,14 @@ import { mount } from 'enzyme';
 let component;
 describe('basic', () => {
   beforeEach(() => {
+    const SomeComponent = () => null;
+    const SomeOtherComponent = () => <div />;
     component = mount(<MyComponent {...{ first: 'eslint', second: 'jest'}} />);
+  });
+
+  it('replaces toHaveBeenRendered', () => {
+    expect(component.find(ClassBased)).toExist();
+    expect(component.find(OtherClassBased)).not.toExist();
   });
 
   it('replaces toHaveBeenRenderedWithProps', () => {

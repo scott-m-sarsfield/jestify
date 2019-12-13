@@ -5,6 +5,7 @@ import convertToEnzyme from './convert_to_enzyme';
 import replaceComponentStubs from './replace_component_stubs';
 import jasmineToJest from 'jest-codemods/dist/transformers/jasmine-globals';
 import convertDispatcherTests from './convert_dispatcher_tests';
+import kitchenSink from './kitchen_sink';
 
 module.exports = function(file, api, options) {
   const fixes = [
@@ -14,7 +15,8 @@ module.exports = function(file, api, options) {
     convertAsyncTests,
     convertDispatcherTests,
     replaceComponentStubs,
-    convertToEnzyme
+    convertToEnzyme,
+    kitchenSink
   ];
   let src = file.source;
   fixes.forEach((fix) => {

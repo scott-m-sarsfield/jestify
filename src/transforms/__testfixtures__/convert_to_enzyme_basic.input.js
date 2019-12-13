@@ -1,9 +1,16 @@
 describe('basic', () => {
   beforeEach(() => {
+    const SomeComponent = createSpyComponent();
+    const SomeOtherComponent = createSpyComponent(() => <div />);
     ReactDOM.render(
       <MyComponent {...{ first: 'eslint', second: 'jest'}} />,
       root
     );
+  });
+
+  it('replaces toHaveBeenRendered', () => {
+    expect(ClassBased).toHaveBeenRendered();
+    expect(OtherClassBased).not.toHaveBeenRendered();
   });
 
   it('replaces toHaveBeenRenderedWithProps', () => {
