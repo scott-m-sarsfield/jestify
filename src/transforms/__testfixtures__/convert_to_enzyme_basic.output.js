@@ -39,6 +39,11 @@ describe('basic', () => {
 
   it('replaces literal (class?) assertions', () => {
     expect(component.find('.banana-class')).toExist();
+    expect(component.find('.banana-class')).not.toExist();
+    expect(component.find('.some-class')).toHaveText('some text');
+    expect(component.find('.some-class')).not.toHaveText('some text');
+    expect(component.find('.some-class')).toIncludeText('some text');
+    expect(component.find('.some-class')).not.toIncludeText('some text');
   });
 
   it('replaces propsOnLastRender', () => {

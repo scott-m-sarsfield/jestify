@@ -143,8 +143,8 @@ function replaceToContainText(root, j) {
   });
 }
 
-function replaceLiteralToExist(root, j) {
-  return root.find(
+function replaceClassMatcher(root, j, { matcherName }) {
+  root.find(
     j.MemberExpression,
     {
       object: {
@@ -158,13 +158,52 @@ function replaceLiteralToExist(root, j) {
         ]
       },
       property: {
-        name: 'toExist'
+        name: matcherName
       }
     }
   ).replaceWith((nodePath) => {
     const { node } = nodePath;
     const literal = node.object.arguments[0];
     node.object.arguments = [
+      j.callExpression(
+        j.memberExpression(
+          j.identifier('component'),
+          j.identifier('find')
+        ),
+        [
+          literal
+        ]
+      )
+    ];
+    return node;
+  });
+
+  root.find(
+    j.MemberExpression,
+    {
+      object: {
+        object: {
+          callee: {
+            name: 'expect'
+          },
+          arguments: [
+            {
+              type: 'Literal'
+            }
+          ]
+        },
+        property: {
+          name: 'not'
+        }
+      },
+      property: {
+        name: matcherName
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+    const literal = node.object.object.arguments[0];
+    node.object.object.arguments = [
       j.callExpression(
         j.memberExpression(
           j.identifier('component'),
@@ -331,5 +370,7 @@ export function replaceAssertions(root, j, variables) {
   replaceTextTests(root, j);
   replaceRootExpectations(root, j);
   replaceToContainText(root, j);
-  replaceLiteralToExist(root, j);
+  replaceClassMatcher(root, j, { matcherName: 'toExist' });
+  replaceClassMatcher(root, j, { matcherName: 'toHaveText' });
+  replaceClassMatcher(root, j, { matcherName: 'toIncludeText' });
 }

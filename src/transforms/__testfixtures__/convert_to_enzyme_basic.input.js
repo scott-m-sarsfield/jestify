@@ -40,6 +40,11 @@ describe('basic', () => {
 
   it('replaces literal (class?) assertions', () => {
     expect('.banana-class').toExist();
+    expect('.banana-class').not.toExist();
+    expect('.some-class').toHaveText('some text');
+    expect('.some-class').not.toHaveText('some text');
+    expect('.some-class').toContainText('some text');
+    expect('.some-class').not.toContainText('some text');
   });
 
   it('replaces propsOnLastRender', () => {
