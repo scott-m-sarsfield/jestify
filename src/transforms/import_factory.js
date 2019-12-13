@@ -1,48 +1,5 @@
 import sourceOptions from '../utils/source_options';
-
-function autoIncludeFactory(root, j) {
-  if (!isFactoryUsed(root, j) || isFactoryImported(root, j)) {
-    return root;
-  }
-
-  return root.find(
-    j.Program
-  ).replaceWith((pathNode) => {
-    const factoryImport = j.importDeclaration(
-      [
-        j.importSpecifier(
-          j.identifier('Factory'),
-          j.identifier('Factory')
-        )
-      ],
-      j.literal('rosie')
-    );
-
-    pathNode.node.body.splice(0, 0, factoryImport);
-
-    return pathNode.node;
-  });
-}
-
-function isFactoryUsed(root, j) {
-  return root.find(
-    j.Identifier,
-    {
-      name: 'Factory'
-    }
-  ).size() > 0;
-}
-
-function isFactoryImported(root, j) {
-  return root.find(
-    j.ImportSpecifier,
-    {
-      local: {
-        name: 'Factory'
-      }
-    }
-  ).size() > 0;
-}
+import { autoIncludeImport } from '../utils/auto_include_import';
 
 export default function(fileInfo, api) {
   let source = fileInfo.source;
@@ -50,7 +7,10 @@ export default function(fileInfo, api) {
 
   let root = j(source);
 
-  root = autoIncludeFactory(root, j);
+  root = autoIncludeImport(root, j, {
+    importName: 'Factory',
+    importSource: 'rosie'
+  });
 
   return root.toSource(sourceOptions);
 }

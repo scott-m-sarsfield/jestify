@@ -1,44 +1,6 @@
 import { relativePath } from './jestifications/helpers';
 import sourceOptions from '../utils/source_options';
-import { appendAfterImportDeclarations } from '../utils/append_after_imports';
-
-function importArrayToModelStore(root, j, filePath) {
-  if (!arrayToModelStoreIsUsed(root, j) || arrayToModelStoreAlreadyImported(root, j)) {
-    return root;
-  }
-
-  const arrayToModelStoreImport = j.importDeclaration(
-    [
-      j.importSpecifier(
-        j.identifier('arrayToModelStore'),
-        j.identifier('arrayToModelStore')
-      )
-    ],
-    j.literal(relativePath(filePath, 'frontend/app/helpers/data_helper'))
-  );
-
-  appendAfterImportDeclarations(root, j, arrayToModelStoreImport);
-}
-
-function arrayToModelStoreIsUsed(root, j) {
-  return root.find(
-    j.Identifier,
-    {
-      name: 'arrayToModelStore'
-    }
-  ).size() > 0;
-}
-
-function arrayToModelStoreAlreadyImported(root, j) {
-  return root.find(
-    j.ImportSpecifier,
-    {
-      local: {
-        name: 'arrayToModelStore'
-      }
-    }
-  ).size() > 0;
-}
+import { autoIncludeImport } from '../utils/auto_include_import';
 
 export default function(fileInfo, api) {
   let source = fileInfo.source;
@@ -46,7 +8,11 @@ export default function(fileInfo, api) {
 
   let root = j(source);
 
-  importArrayToModelStore(root, j, fileInfo.path);
+  autoIncludeImport(root, j, {
+    importName: 'arrayToModelStore',
+    importSource: relativePath(fileInfo.path, 'frontend/app/helpers/data_helper'),
+    last: true
+  });
 
   return root.toSource(sourceOptions);
 }
