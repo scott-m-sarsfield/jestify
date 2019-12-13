@@ -45,4 +45,12 @@ describe('basic', () => {
   it('replaces jquery clicks', () => {
     $('.big-o-button').click();
   });
+
+  it('replaces jquery selectors', () => {
+    const elm = $('.check');
+  });
+
+  it('replaces array selector', () => {
+    $('.question')[0].innerText = 'answer';
+  });
 });

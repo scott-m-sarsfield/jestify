@@ -107,9 +107,61 @@ function replaceReactTestRendererFindBy(root, j, variables) {
   });
 }
 
+function replaceJQuerySelectors(root, j) {
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        name: '$'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    node.callee = j.memberExpression(
+      j.identifier('component'),
+      j.identifier('find')
+    );
+    return node;
+  });
+}
+
+function replaceComponentFindArrayAccessor(root, j) {
+  root.find(
+    j.MemberExpression,
+    {
+      object: {
+        callee: {
+          object: {
+            name: 'component'
+          },
+          property: {
+            name: 'find'
+          }
+        }
+      },
+      computed: true
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+
+    return j.callExpression(
+      j.memberExpression(
+        node.object,
+        j.identifier('at')
+      ),
+      [
+        node.property
+      ]
+    );
+  });
+}
+
 export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
   replaceJQueryClick(root, j);
   replaceReactTestRendererFindBy(root, j, variables);
+  replaceJQuerySelectors(root, j);
+  replaceComponentFindArrayAccessor(root, j);
 }

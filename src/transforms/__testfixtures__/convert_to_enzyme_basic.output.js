@@ -44,4 +44,12 @@ describe('basic', () => {
   it('replaces jquery clicks', () => {
     component.find('.big-o-button').simulate('click');
   });
+
+  it('replaces jquery selectors', () => {
+    const elm = component.find('.check');
+  });
+
+  it('replaces array selector', () => {
+    component.find('.question').at(0).innerText = 'answer';
+  });
 });
