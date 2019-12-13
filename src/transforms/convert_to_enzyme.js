@@ -53,8 +53,8 @@ function makeEnzymeChanges(root, j) {
   importEnzymeMount(root, j);
   addGlobalComponentVariable(root, j);
   replaceRenderFunctions(root, j, variables);
-  replaceAssertions(root, j, variables);
   replaceUtilities(root, j, variables);
+  replaceAssertions(root, j, variables);
   cleanupUselessCode(root, j, variables);
 }
 

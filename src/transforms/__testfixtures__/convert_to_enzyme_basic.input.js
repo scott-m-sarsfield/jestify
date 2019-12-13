@@ -20,6 +20,7 @@ describe('basic', () => {
 
   it('replaces jquery text tests', () => {
     expect($('.some-class').text()).toEqual('banana');
+    expect($('.some-other-class')[0].innerText).toEqual('bread');
   });
 
   it('replaces root', () => {

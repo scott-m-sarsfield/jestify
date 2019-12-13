@@ -157,6 +157,26 @@ function replaceComponentFindArrayAccessor(root, j) {
   });
 }
 
+function replaceInnerText(root, j) {
+  root.find(
+    j.MemberExpression,
+    {
+      property: {
+        name: 'innerText'
+      }
+    }
+  ).replaceWith((nodePath) => {
+    const { node } = nodePath;
+    return j.callExpression(
+      j.memberExpression(
+        node.object,
+        j.identifier('text')
+      ),
+      []
+    );
+  });
+}
+
 export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
@@ -164,4 +184,5 @@ export function replaceUtilities(root, j, variables) {
   replaceReactTestRendererFindBy(root, j, variables);
   replaceJQuerySelectors(root, j);
   replaceComponentFindArrayAccessor(root, j);
+  replaceInnerText(root, j);
 }

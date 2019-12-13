@@ -1,4 +1,4 @@
-function replaceJQueryTextTests(root, j) {
+function replaceTextTests(root, j) {
   return root.find(
     j.MemberExpression,
     {
@@ -9,11 +9,6 @@ function replaceJQueryTextTests(root, j) {
         arguments: [
           {
             callee: {
-              object: {
-                callee: {
-                  name: '$'
-                }
-              },
               property: {
                 name: 'text'
               }
@@ -27,19 +22,13 @@ function replaceJQueryTextTests(root, j) {
     }
   ).replaceWith((nodePath) => {
     const { node } = nodePath;
-    const jquerySelector = node.object.arguments[0].callee.object.arguments[0];
+    const enzymeWrapper = node.object.arguments[0].callee.object;
 
     return j.memberExpression(
       j.callExpression(
         j.identifier('expect'),
         [
-          j.callExpression(
-            j.memberExpression(
-              j.identifier('component'),
-              j.identifier('find')
-            ),
-            [jquerySelector]
-          )
+          enzymeWrapper
         ]
       ),
       j.identifier('toHaveText')
@@ -257,7 +246,7 @@ export function replaceAssertions(root, j, variables) {
   replaceSpyComponentPropAssertions(root, j, 'toHaveBeenPassedProps');
   replaceReactTestRendererExpectComponentWithPropsToExist(root, j, variables);
   removeRedundantHavePropObjectContaining(root, j);
-  replaceJQueryTextTests(root, j);
+  replaceTextTests(root, j);
   replaceRootExpectations(root, j);
   replaceToContainText(root, j);
   replaceLiteralToExist(root, j);

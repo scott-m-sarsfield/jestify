@@ -19,6 +19,7 @@ describe('basic', () => {
 
   it('replaces jquery text tests', () => {
     expect(component.find('.some-class')).toHaveText('banana');
+    expect(component.find('.some-other-class').at(0)).toHaveText('bread');
   });
 
   it('replaces root', () => {
@@ -50,6 +51,6 @@ describe('basic', () => {
   });
 
   it('replaces array selector', () => {
-    component.find('.question').at(0).innerText = 'answer';
+    component.find('.question').at(0).text() = 'answer';
   });
 });
