@@ -7,6 +7,10 @@ describe('basic', () => {
     component = mount(<MyComponent {...{ first: 'eslint', second: 'jest'}} />);
   });
 
+  it('converts global render', () => {
+    component = mount(<OtherComponent />);
+  });
+
   it('replaces toHaveBeenRendered', () => {
     expect(component.find(ClassBased)).toExist();
     expect(component.find(OtherClassBased)).not.toExist();

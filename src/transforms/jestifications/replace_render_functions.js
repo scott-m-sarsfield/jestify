@@ -36,6 +36,49 @@ function replaceReactDOMRender(root, j) {
   });
 }
 
+function replaceGlobalRender(root, j) {
+  let renderDefined = false;
+
+  root.find(
+    j.VariableDeclarator,
+    {
+      id: {
+        name: 'render'
+      }
+    }
+  ).at(0).forEach(() => {
+    renderDefined = true;
+  });
+
+  root.find(
+    j.FunctionDeclaration,
+    {
+      id: {
+        name: 'render'
+      }
+    }
+  ).at(0).forEach(() => {
+    renderDefined = true;
+  });
+
+  if (!renderDefined) {
+    root.find(
+      j.ExpressionStatement,
+      {
+        expression: {
+          callee: {
+            name: 'render'
+          }
+        }
+      }
+    ).replaceWith((nodePath) => {
+      const { node } = nodePath;
+      const jsx = node.expression.arguments[0];
+      return generateComponentEqualMount(j, jsx);
+    });
+  }
+}
+
 function replaceReactTestRendererCreate(root, j, variables) {
   root.find(
     j.ExpressionStatement,
@@ -151,6 +194,7 @@ function replaceReactDOMUnmount(root, j) {
 
 export function replaceRenderFunctions(root, j, variables) {
   replaceReactDOMRender(root, j);
+  replaceGlobalRender(root, j);
   replaceReactDOMUnmount(root, j);
   replaceReactTestRendererCreate(root, j, variables);
 }

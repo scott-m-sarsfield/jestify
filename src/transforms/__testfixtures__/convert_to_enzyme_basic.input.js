@@ -8,6 +8,10 @@ describe('basic', () => {
     );
   });
 
+  it('converts global render', () => {
+    render(<OtherComponent />);
+  });
+
   it('replaces toHaveBeenRendered', () => {
     expect(ClassBased).toHaveBeenRendered();
     expect(OtherClassBased).not.toHaveBeenRendered();
