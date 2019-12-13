@@ -1,6 +1,6 @@
 {
   "name": "@scott-m-sarsfield/jestify",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "script w/ jscodeshift to jestify jasmine specs",
   "main": "index.js",
   "repository": {
