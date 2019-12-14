@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const meow = require('meow');
 const path = require('path');
 const execa = require('execa');
+const moveAndRename = require('./move_and_rename');
 
 const transformerDistDirectory = path.join(__dirname, 'dist', 'transforms');
 const jscodeshiftExecutable = require.resolve('.bin/jscodeshift');
@@ -42,22 +43,19 @@ function expandFilePathsIfNeeded(filesBeforeExpansion) {
 }
 
 function run() {
-  const cli = meow(
-    {
-      description: 'Codemods for jestifying legacy jasmine specs',
-      help: `
+  const cli = meow(`
     Usage
       $ npx @scott-m-sarsfield/jestify <path>
         path         Files or directory to transform. Can be a glob like src/**.test.js
-    `
-    },
-    {
-      boolean: ['help'],
-      string: ['_'],
-      alias: {
-        h: 'help'
+    `,
+  {
+    flags: {
+      move: {
+        type: 'boolean',
+        alias: 'm'
       }
     }
+  }
   );
 
   inquirer
@@ -72,11 +70,11 @@ function run() {
         filter: (files) => files.trim()
       }
     ])
-    .then((answers) => {
+    .then(async (answers) => {
       const { files } = answers;
 
       const filesBeforeExpansion = cli.input[0] || files;
-      const filesExpanded = expandFilePathsIfNeeded([filesBeforeExpansion]);
+      let filesExpanded = expandFilePathsIfNeeded([filesBeforeExpansion]);
 
       if (!filesExpanded.length) {
         console.log(
@@ -85,9 +83,12 @@ function run() {
         return null;
       }
 
+      if (cli.flags.move) {
+        filesExpanded = await moveAndRename({ files: filesExpanded });
+      }
+
       return runTransform({
-        files: filesExpanded,
-        flags: cli.flags
+        files: filesExpanded
       });
     });
 }
