@@ -128,17 +128,17 @@ function replaceRootExpectations(root, j) {
   });
 }
 
-function replaceToContainText(root, j) {
+function replaceMatcher(root, j, { oldMatcherName, matcherName }) {
   return root.find(
     j.MemberExpression,
     {
       property: {
-        name: 'toContainText'
+        name: oldMatcherName
       }
     }
   ).replaceWith((nodePath) => {
     const { node } = nodePath;
-    node.property = j.identifier('toIncludeText');
+    node.property = j.identifier(matcherName);
     return node;
   });
 }
@@ -369,8 +369,10 @@ export function replaceAssertions(root, j, variables) {
   removeRedundantHavePropObjectContaining(root, j);
   replaceTextTests(root, j);
   replaceRootExpectations(root, j);
-  replaceToContainText(root, j);
+  replaceMatcher(root, j, { oldMatcherName: 'toContainText', matcherName: 'toIncludeText' });
+  replaceMatcher(root, j, { oldMatcherName: 'toHaveClass', matcherName: 'toHaveClassName' });
   replaceClassMatcher(root, j, { matcherName: 'toExist' });
   replaceClassMatcher(root, j, { matcherName: 'toHaveText' });
   replaceClassMatcher(root, j, { matcherName: 'toIncludeText' });
+  replaceClassMatcher(root, j, { matcherName: 'toHaveLength' });
 }

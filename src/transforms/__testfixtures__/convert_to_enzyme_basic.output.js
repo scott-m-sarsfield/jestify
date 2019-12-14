@@ -37,8 +37,9 @@ describe('basic', () => {
     expect(component).toHaveText('tired');
   });
 
-  it('replaces toContainText', () => {
+  it('replaces simple matchers', () => {
     expect(component).toIncludeText('something silly');
+    expect(component).toHaveClassName('.silly');
   });
 
   it('replaces literal (class?) assertions', () => {
@@ -48,6 +49,7 @@ describe('basic', () => {
     expect(component.find('.some-class')).not.toHaveText('some text');
     expect(component.find('.some-class')).toIncludeText('some text');
     expect(component.find('.some-class')).not.toIncludeText('some text');
+    expect(component.find('.some-class')).toHaveLength(3);
   });
 
   it('replaces propsOnLastRender', () => {
