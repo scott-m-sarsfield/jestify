@@ -63,6 +63,7 @@ describe('basic', () => {
 
   it('replaces propsOnRenderAt', () => {
     propsOnRenderAt(Bumblebee, 2).onSubmit();
+    propsPassedOnRenderAt(Wasp, 1).onClick();
   });
 
   it('replaces jquery clicks', () => {

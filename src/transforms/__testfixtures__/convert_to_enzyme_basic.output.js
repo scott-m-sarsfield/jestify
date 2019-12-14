@@ -62,6 +62,7 @@ describe('basic', () => {
 
   it('replaces propsOnRenderAt', () => {
     component.find(Bumblebee).at(2).props().onSubmit();
+    component.find(Wasp).at(1).props().onClick();
   });
 
   it('replaces jquery clicks', () => {

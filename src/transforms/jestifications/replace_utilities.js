@@ -198,12 +198,12 @@ function replaceSpyComponent(root, j) {
   });
 }
 
-function replacePropsOnRenderAt(root, j) {
+function replacePropsOnRenderAt(root, j, helperName = 'propsOnRenderAt') {
   root.find(
     j.CallExpression,
     {
       callee: {
-        name: 'propsOnRenderAt'
+        name: helperName
       }
     }
   ).replaceWith((nodePath) => {
@@ -239,6 +239,7 @@ export function replaceUtilities(root, j, variables) {
   replacePropsAccessor(root, j, 'propsOnLastRender');
   replacePropsAccessor(root, j, 'propsPassedOnLastRender');
   replacePropsOnRenderAt(root, j);
+  replacePropsOnRenderAt(root, j, 'propsPassedOnRenderAt');
   replaceJQueryClick(root, j);
   replaceReactTestRendererFindBy(root, j, variables);
   replaceJQuerySelectors(root, j);
