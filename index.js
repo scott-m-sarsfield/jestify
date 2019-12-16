@@ -53,6 +53,10 @@ function run() {
       move: {
         type: 'boolean',
         alias: 'm'
+      },
+      version: {
+        type: 'boolean',
+        alias: 'v'
       }
     }
   }
