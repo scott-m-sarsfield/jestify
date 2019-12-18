@@ -50,6 +50,10 @@ describe('basic', () => {
     expect(component.find('.some-class')).toIncludeText('some text');
     expect(component.find('.some-class')).not.toIncludeText('some text');
     expect(component.find('.some-class')).toHaveLength(3);
+    expect(component.find('.some-class')).toBeChecked();
+    expect(component.find('.some-class')).toBeDisabled();
+    expect(component.find('.some-class')).toHaveProp('disabled');
+    expect(component.find('.some-class')).toHaveProp('src', 'http://youtube.com');
   });
 
   it('replaces propsOnLastRender', () => {

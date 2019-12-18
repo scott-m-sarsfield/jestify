@@ -51,6 +51,10 @@ describe('basic', () => {
     expect('.some-class').toContainText('some text');
     expect('.some-class').not.toContainText('some text');
     expect('.some-class').toHaveLength(3);
+    expect('.some-class').toBeChecked();
+    expect('.some-class').toBeDisabled();
+    expect('.some-class').toHaveAttr('disabled');
+    expect('.some-class').toHaveAttr('src', 'http://youtube.com');
   });
 
   it('replaces propsOnLastRender', () => {
