@@ -1,5 +1,6 @@
 import { hasJSX } from './jestifications/has_jsx';
 import importEnzymeMount from './jestifications/import_enzyme_mount';
+import importReact from './jestifications/import_react';
 import { addGlobalComponentVariable } from './jestifications/add_global_component_variable';
 import { replaceRenderFunctions } from './jestifications/replace_render_functions';
 import { replaceAssertions } from './jestifications/replace_assertions';
@@ -101,6 +102,7 @@ function makeEnzymeChanges(root, j) {
   const variables = {};
 
   importEnzymeMount(root, j);
+  importReact(root, j);
   addGlobalComponentVariable(root, j);
   replaceRenderFunctions(root, j, variables);
   replaceUtilities(root, j, variables);

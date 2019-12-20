@@ -1,3 +1,4 @@
+import React from 'react';
 import { mount } from 'enzyme';
 import ComponentUnderTest from 'app/components/component_under_test';
 import ChildComponent from 'app/components/child_component';
