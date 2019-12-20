@@ -55,6 +55,7 @@ describe('basic', () => {
     expect('.some-class').toBeDisabled();
     expect('.some-class').toHaveAttr('disabled');
     expect('.some-class').toHaveAttr('src', 'http://youtube.com');
+    expect('input.whatever').toHaveValue('5');
   });
 
   it('replaces propsOnLastRender', () => {

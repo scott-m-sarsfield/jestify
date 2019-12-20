@@ -55,6 +55,7 @@ describe('basic', () => {
     expect(component.find('.some-class')).toBeDisabled();
     expect(component.find('.some-class')).toHaveProp('disabled');
     expect(component.find('.some-class')).toHaveProp('src', 'http://youtube.com');
+    expect(component.find('input.whatever')).toHaveValue('5');
   });
 
   it('replaces propsOnLastRender', () => {
