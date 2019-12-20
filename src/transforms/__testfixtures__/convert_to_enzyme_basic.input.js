@@ -79,7 +79,12 @@ describe('basic', () => {
   });
 
   it('replaces array selector', () => {
-    $('.question')[0].innerText = 'answer';
+    $('.question')[0].innerText;
+  });
+
+  it('replaces :eq psuedoselectors', () => {
+    expect('.some-class:eq(0)').toHaveClass('selected');
+    $('.da-button:eq(3)').simulate('click');
   });
 
   it('replaces unmount', () => {

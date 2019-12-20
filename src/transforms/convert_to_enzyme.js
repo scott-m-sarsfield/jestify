@@ -43,6 +43,56 @@ function cleanupUselessCode(root, j, variables) {
   cleanupReactTestRendererExpectCurry(root, j, variables);
 }
 
+function replacePsuedoSelectors(root, j) {
+  const ENDS_IN_EQ_REGEX = /(.*):eq\(([0-9]+)\)[\s]*$/;
+  root.find(
+    j.CallExpression,
+    {
+      callee: {
+        object: {
+          name: 'component'
+        },
+        property: {
+          name: 'find'
+        }
+      },
+      arguments: [
+        {
+          type: 'Literal'
+        }
+      ]
+    }
+  ).filter((nodePath) => {
+    const { node } = nodePath;
+
+    const cssSelector = node.arguments[0].value;
+
+    return ENDS_IN_EQ_REGEX.test(cssSelector);
+  }).replaceWith((nodePath) => {
+    const { node } = nodePath;
+    const cssSelector = node.arguments[0].value;
+
+    const match = cssSelector.match(ENDS_IN_EQ_REGEX);
+    const prefix = match[1];
+    const index = match[2];
+
+    return j.callExpression(
+      j.memberExpression(
+        j.callExpression(
+          node.callee,
+          [
+            j.literal(prefix)
+          ]
+        ),
+        j.identifier('at')
+      ),
+      [
+        j.literal(Number(index))
+      ]
+    );
+  });
+}
+
 function makeEnzymeChanges(root, j) {
   if (!hasJSX(root, j)) {
     return;
@@ -55,6 +105,7 @@ function makeEnzymeChanges(root, j) {
   replaceRenderFunctions(root, j, variables);
   replaceUtilities(root, j, variables);
   replaceAssertions(root, j, variables);
+  replacePsuedoSelectors(root, j);
   cleanupUselessCode(root, j, variables);
 }
 

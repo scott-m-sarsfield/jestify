@@ -379,4 +379,5 @@ export function replaceAssertions(root, j, variables) {
   replaceClassMatcher(root, j, { matcherName: 'toBeChecked' });
   replaceClassMatcher(root, j, { matcherName: 'toBeDisabled' });
   replaceClassMatcher(root, j, { matcherName: 'toHaveProp' });
+  replaceClassMatcher(root, j, { matcherName: 'toHaveClassName' });
 }

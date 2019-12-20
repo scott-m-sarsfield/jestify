@@ -78,7 +78,12 @@ describe('basic', () => {
   });
 
   it('replaces array selector', () => {
-    component.find('.question').at(0).text() = 'answer';
+    component.find('.question').at(0).text();
+  });
+
+  it('replaces :eq psuedoselectors', () => {
+    expect(component.find('.some-class').at(0)).toHaveClassName('selected');
+    component.find('.da-button').at(3).simulate('click');
   });
 
   it('replaces unmount', () => {
